@@ -59,9 +59,15 @@ class HttpClient {
 
   RequestOptions _createRequestOptions(
       {required HttpDataTargetType targetType}) {
-    RequestOptions options = RequestOptions(path: targetType.path);
+    final path = targetType.path;
+    if (path.startsWith("/")) {
+      path.replaceFirst("/", "");
+    }
+    RequestOptions options = RequestOptions(path: path);
     options.connectTimeout = targetType.timeoutInterval;
-    options.baseUrl = targetType.baseUrl;
+    if (!targetType.baseUrl.endsWith("/")) {
+      options.baseUrl = targetType.baseUrl + '/';
+    }
     options.method = targetType.method.rawValue;
 
     options.headers = _createHeaders(targetType: targetType);
