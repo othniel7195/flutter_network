@@ -1,3 +1,12 @@
+/*
+ * @Author: jimmy.zhao
+ * @Date: 2022-01-13 19:24:39
+ * @LastEditTime: 2022-02-16 18:04:12
+ * @LastEditors: jimmy.zhao
+ * @Description: 
+ * 
+ * 
+ */
 //
 //  http_error.dart
 //  http_client
@@ -24,5 +33,23 @@ class HttpError {
 
   String get dioErrorMessage {
     return dioError.message;
+  }
+
+  String get serverMessage {
+    if (dioError.response?.data != null) {
+      final Map<String, dynamic> dict = dioError.response!.data;
+      String message = dict['message'];
+      return message;
+    }
+    return '';
+  }
+
+  int get serverCode {
+    if (dioError.response?.data != null) {
+      final Map<String, dynamic> dict = dioError.response!.data;
+      int code = dict['code'];
+      return code;
+    }
+    return -1;
   }
 }

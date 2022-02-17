@@ -14,6 +14,7 @@ import 'package:dio/dio.dart';
 import 'package:dio_http2_adapter/dio_http2_adapter.dart';
 import 'package:flutter/foundation.dart';
 import 'http_middleware.dart';
+import 'http_method.dart';
 
 class HttpClient {
   factory HttpClient() => _instance;
@@ -37,11 +38,10 @@ class HttpClient {
   late Dio _dio;
   late HttpMiddleware _middleware;
 
-  Future<HttpJResponse<T>> request<T>(
+  Future<dynamic> request<T>(
       {required HttpDataTargetType targetType, custom}) async {
     RequestOptions options = _createRequestOptions(targetType: targetType);
-    Response<T> response = await _dio.fetch(options);
-
+    Response<T> response = await _dio.fetch<T>(options);
     return HttpJResponse<T>(
         response: response,
         data: response.data,
@@ -75,7 +75,14 @@ class HttpClient {
         HttpRequestParameterEncoding.encode(targetType.method);
 
     if (targetType.parameters != null) {
-      options.queryParameters = targetType.parameters!;
+      switch (targetType.method) {
+        case HttpMethod.get:
+          options.queryParameters = targetType.parameters!;
+          break;
+        default:
+          options.data = targetType.parameters!;
+          break;
+      }
     }
 
     options.validateStatus = (int? status) {
