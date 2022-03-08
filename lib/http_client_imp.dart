@@ -15,14 +15,12 @@ import 'package:dio_http2_adapter/dio_http2_adapter.dart';
 import 'package:flutter/foundation.dart';
 import 'http_middleware.dart';
 import 'http_method.dart';
+import 'package:dio/adapter.dart';
+import 'dart:io';
 
 class HttpClient {
-  factory HttpClient() => _instance;
-  static late final HttpClient _instance = HttpClient._internal();
-  HttpClient._internal() {
-    setup();
-  }
-  void setup() {
+  HttpClient();
+  void setup(String? proxyUri) {
     _dio = Dio();
     _middleware = HttpMiddleware();
     _dio.interceptors.add(_middleware);
@@ -30,13 +28,28 @@ class HttpClient {
       _dio.interceptors
           .add(LogInterceptor(requestBody: true, responseBody: true));
     }
-    _dio.httpClientAdapter = Http2Adapter(
-      ConnectionManager(),
-    );
+    _dio.httpClientAdapter = DefaultHttpClientAdapter();
+    setProxyUri = proxyUri;
   }
 
   late Dio _dio;
   late HttpMiddleware _middleware;
+
+  set setProxyUri(String? uri) {
+    if (uri == null) {
+      (_dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate =
+          null;
+    } else {
+      (_dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate =
+          (c) {
+        c.findProxy = (u) {
+          return "PROXY $uri";
+        };
+        c.badCertificateCallback =
+            (X509Certificate cert, String host, int port) => true;
+      };
+    }
+  }
 
   Future<dynamic> request<T>(
       {required HttpDataTargetType targetType, custom}) async {
