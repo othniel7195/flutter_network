@@ -14,22 +14,24 @@ import 'http_response.j.dart';
 abstract class HttpPlugin {
   Map<String, dynamic>? get extraParameters => null;
 
-  RequestOptions beforeCreateRequestOptions(
+  Future<RequestOptions> beforeCreateRequestOptions(
       {required RequestOptions options, required HttpTargetType type}) {
-    return options;
+    return Future.value(options);
   }
 
-  RequestOptions beforeRequest({required RequestOptions options}) {
-    return options;
+  Future<RequestOptions> beforeRequest({required RequestOptions options}) {
+    return Future.value(options);
   }
 
   void didReceive({required HttpJResponse response}) {}
+
   HttpJResponse process({required HttpJResponse response}) {
     return response;
   }
 
-  void interceptorError({required HttpError error}) {}
-  HttpError processError({required HttpError error}) {
+  void interceptorError({required HttpError error, required ErrorInterceptorHandler handler}) {}
+
+  HttpError processError({required HttpError error, required ErrorInterceptorHandler handler}) {
     return error;
   }
 }

@@ -28,11 +28,11 @@ class HttpMiddleware extends Interceptor {
   }
 
   @override
-  void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
+  void onRequest(RequestOptions options, RequestInterceptorHandler handler) async {
     RequestOptions requestOptions = options;
     if (_plugins != null) {
       for (var plugin in _plugins!) {
-        requestOptions = plugin.beforeRequest(options: requestOptions);
+        requestOptions = await plugin.beforeRequest(options: requestOptions);
       }
     }
     super.onRequest(requestOptions, handler);
@@ -59,8 +59,8 @@ class HttpMiddleware extends Interceptor {
     HttpError error = HttpError(dioError: err);
     if (_plugins != null) {
       for (var plugin in _plugins!) {
-        plugin.interceptorError(error: error);
-        error = plugin.processError(error: error);
+        plugin.interceptorError(error: error, handler: handler);
+        error = plugin.processError(error: error, handler: handler);
       }
     }
     super.onError(error.dioError, handler);

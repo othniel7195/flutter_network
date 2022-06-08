@@ -33,13 +33,13 @@ class AccessTokenPlugin extends HttpPlugin {
   final String token;
   AccessTokenPlugin({required this.token});
   @override
-  RequestOptions beforeCreateRequestOptions(
+  Future<RequestOptions> beforeCreateRequestOptions(
       {required RequestOptions options, required HttpTargetType type}) {
     AccessTokenAuthorizable at = type as AccessTokenAuthorizable;
     AuthorizationType atT = at.authorizationType;
     if (atT.value != null) {
       options.headers['authorization'] = "${atT.value} $token";
     }
-    return options;
+    return Future.value(options);
   }
 }

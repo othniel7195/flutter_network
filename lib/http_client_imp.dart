@@ -11,7 +11,6 @@ import 'http_response.j.dart';
 import 'http_target_type.dart';
 import 'http_validation_type.dart';
 import 'package:dio/dio.dart';
-import 'package:dio_http2_adapter/dio_http2_adapter.dart';
 import 'package:flutter/foundation.dart';
 import 'http_middleware.dart';
 import 'http_method.dart';
@@ -62,6 +61,15 @@ class HttpClient {
         statusMessage: response.statusMessage);
   }
 
+  Future<dynamic> requesOptions<T>({required RequestOptions options}) async {
+    Response<T> response = await _dio.fetch<T>(options);
+    return HttpJResponse<T>(
+        response: response,
+        data: response.data,
+        statusCode: response.statusCode,
+        statusMessage: response.statusMessage);
+  }
+
   void addPlugin({required HttpPlugin plugin}) {
     _middleware.addPlugin(plugin);
   }
@@ -102,9 +110,9 @@ class HttpClient {
       return _checkStatusCode(targetType: targetType, statusCode: status);
     };
     _middleware.getAll()?.forEach(
-      (e) {
-        options =
-            e.beforeCreateRequestOptions(options: options, type: targetType);
+      (e) async {
+        options = await e.beforeCreateRequestOptions(
+            options: options, type: targetType);
       },
     );
     return options;
