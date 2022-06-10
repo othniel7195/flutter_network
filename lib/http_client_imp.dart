@@ -110,8 +110,8 @@ class HttpClient {
       return _checkStatusCode(targetType: targetType, statusCode: status);
     };
     _middleware.getAll()?.forEach(
-      (e) async {
-        options = await e.beforeCreateRequestOptions(
+      (e) {
+        options = e.beforeCreateRequestOptions(
             options: options, type: targetType);
       },
     );

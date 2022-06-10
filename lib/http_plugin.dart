@@ -14,9 +14,9 @@ import 'http_response.j.dart';
 abstract class HttpPlugin {
   Map<String, dynamic>? get extraParameters => null;
 
-  Future<RequestOptions> beforeCreateRequestOptions(
+  RequestOptions beforeCreateRequestOptions(
       {required RequestOptions options, required HttpTargetType type}) {
-    return Future.value(options);
+    return options;
   }
 
   Future<RequestOptions> beforeRequest({required RequestOptions options}) {
