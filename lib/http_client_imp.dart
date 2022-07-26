@@ -5,6 +5,8 @@
 //  Created by jimmy on 2022/1/17.
 //
 
+import 'package:http_client/server_bff_model.dart';
+
 import 'http_plugin.dart';
 import 'http_request_parameter_encoding.dart';
 import 'http_response.j.dart';
@@ -54,6 +56,20 @@ class HttpClient {
       {required HttpDataTargetType targetType, custom}) async {
     RequestOptions options = _createRequestOptions(targetType: targetType);
     Response<T> response = await _dio.fetch<T>(options);
+    Map<String, dynamic>? ft = response.data as Map<String, dynamic>?;
+
+    if (ft != null) {
+      var serverModel = SeverBffModel.fromJson(ft);
+      if (serverModel.code == 0) {
+        return HttpJResponse<Map<String, dynamic>>(
+            response: response,
+            data: serverModel.data,
+            statusCode: response.statusCode,
+            statusMessage: response.statusMessage);
+      } else {
+        throw DioError(requestOptions: options, response: response);
+      }
+    }
     return HttpJResponse<T>(
         response: response,
         data: response.data,
@@ -63,6 +79,20 @@ class HttpClient {
 
   Future<dynamic> requesOptions<T>({required RequestOptions options}) async {
     Response<T> response = await _dio.fetch<T>(options);
+    Map<String, dynamic>? ft = response.data as Map<String, dynamic>?;
+
+    if (ft != null) {
+      var serverModel = SeverBffModel.fromJson(ft);
+      if (serverModel.code == 0) {
+        return HttpJResponse<Map<String, dynamic>>(
+            response: response,
+            data: serverModel.data,
+            statusCode: response.statusCode,
+            statusMessage: response.statusMessage);
+      } else {
+        throw DioError(requestOptions: options, response: response);
+      }
+    }
     return HttpJResponse<T>(
         response: response,
         data: response.data,
@@ -111,8 +141,8 @@ class HttpClient {
     };
     _middleware.getAll()?.forEach(
       (e) {
-        options = e.beforeCreateRequestOptions(
-            options: options, type: targetType);
+        options =
+            e.beforeCreateRequestOptions(options: options, type: targetType);
       },
     );
     return options;
