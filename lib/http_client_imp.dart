@@ -5,6 +5,7 @@
 //  Created by jimmy on 2022/1/17.
 //
 
+import 'package:curl_logger_dio_interceptor/curl_logger_dio_interceptor.dart';
 import 'package:http_client/server_bff_model.dart';
 
 import 'http_plugin.dart';
@@ -26,6 +27,7 @@ class HttpClient {
     _middleware = HttpMiddleware();
     _dio.interceptors.add(_middleware);
     if (kDebugMode) {
+      _dio.interceptors.add(CurlLoggerDioInterceptor(printOnSuccess: true));
       _dio.interceptors
           .add(LogInterceptor(requestBody: true, responseBody: true));
     }
